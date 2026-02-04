@@ -1,0 +1,26 @@
+diff --git a/dist/providers/anthropic.js b/dist/providers/anthropic.js
+index e94eff863c3227604cdefcd9ff2087bda03be979..12e60e26e15e96ebc43fbece02394bb1be051d0c 100644
+--- a/dist/providers/anthropic.js
++++ b/dist/providers/anthropic.js
+@@ -426,6 +426,9 @@ function buildParams(model, context, isOAuthToken, options) {
+             params.tool_choice = options.toolChoice;
+         }
+     }
++    if (options?.metadata) {
++        params.metadata = options.metadata;
++    }
+     return params;
+ }
+ // Normalize tool call IDs to match Anthropic's required pattern and length
+diff --git a/dist/providers/simple-options.js b/dist/providers/simple-options.js
+index c90ebabb8c029cba4cda13ed58630e6decbe7fb2..de04c6dfddebfde53103faec85b41025318c56d1 100644
+--- a/dist/providers/simple-options.js
++++ b/dist/providers/simple-options.js
+@@ -9,6 +9,7 @@ export function buildBaseOptions(model, options, apiKey) {
+         headers: options?.headers,
+         onPayload: options?.onPayload,
+         maxRetryDelayMs: options?.maxRetryDelayMs,
++        metadata: options?.metadata,
+     };
+ }
+ export function clampReasoning(effort) {

@@ -22,7 +22,15 @@ export function resolveExtraParams(params: {
 }): Record<string, unknown> | undefined {
   const modelKey = `${params.provider}/${params.modelId}`;
   const modelConfig = params.cfg?.agents?.defaults?.models?.[modelKey];
-  return modelConfig?.params ? { ...modelConfig.params } : undefined;
+  const modelParams = modelConfig?.params ? { ...modelConfig.params } : {};
+  
+  // Also check provider-level metadata from models.providers config
+  const providerConfig = (params.cfg?.models?.providers as Record<string, { metadata?: unknown }> | undefined)?.[params.provider];
+  if (providerConfig?.metadata && !modelParams.metadata) {
+    modelParams.metadata = providerConfig.metadata;
+  }
+  
+  return Object.keys(modelParams).length > 0 ? modelParams : undefined;
 }
 
 type CacheRetention = "none" | "short" | "long";
@@ -83,6 +91,9 @@ function createStreamFnWithExtraParams(
   const cacheRetention = resolveCacheRetention(extraParams, provider);
   if (cacheRetention) {
     streamParams.cacheRetention = cacheRetention;
+  }
+  if (extraParams.metadata) {
+    (streamParams as Record<string, unknown>).metadata = extraParams.metadata;
   }
 
   if (Object.keys(streamParams).length === 0) {
