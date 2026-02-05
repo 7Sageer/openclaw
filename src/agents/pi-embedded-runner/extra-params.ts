@@ -131,6 +131,7 @@ function createOpenRouterHeadersWrapper(baseStreamFn: StreamFn | undefined): Str
 /**
  * Apply extra params (like temperature) to an agent's streamFn.
  * Also adds OpenRouter app attribution headers when using the OpenRouter provider.
+ * Auto-generates metadata.user_id from sessionKey if not configured.
  *
  * @internal Exported for testing
  */
@@ -140,6 +141,7 @@ export function applyExtraParamsToAgent(
   provider: string,
   modelId: string,
   extraParamsOverride?: Record<string, unknown>,
+  sessionKey?: string,
 ): void {
   const extraParams = resolveExtraParams({
     cfg,
@@ -153,6 +155,13 @@ export function applyExtraParamsToAgent(
         )
       : undefined;
   const merged = Object.assign({}, extraParams, override);
+
+  // Auto-generate metadata.user_id from sessionKey if not configured
+  if (sessionKey && !merged.metadata?.user_id) {
+    const autoUserId = `user_openclaw_${sessionKey.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
+    merged.metadata = { ...merged.metadata, user_id: autoUserId };
+    log.debug(`auto-generated metadata.user_id: ${autoUserId}`);
+  }
   const wrappedStreamFn = createStreamFnWithExtraParams(agent.streamFn, merged, provider);
 
   if (wrappedStreamFn) {
