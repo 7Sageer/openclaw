@@ -23,13 +23,15 @@ export function resolveExtraParams(params: {
   const modelKey = `${params.provider}/${params.modelId}`;
   const modelConfig = params.cfg?.agents?.defaults?.models?.[modelKey];
   const modelParams = modelConfig?.params ? { ...modelConfig.params } : {};
-  
+
   // Also check provider-level metadata from models.providers config
-  const providerConfig = (params.cfg?.models?.providers as Record<string, { metadata?: unknown }> | undefined)?.[params.provider];
+  const providerConfig = (
+    params.cfg?.models?.providers as Record<string, { metadata?: unknown }> | undefined
+  )?.[params.provider];
   if (providerConfig?.metadata && !modelParams.metadata) {
     modelParams.metadata = providerConfig.metadata;
   }
-  
+
   return Object.keys(modelParams).length > 0 ? modelParams : undefined;
 }
 
@@ -157,9 +159,10 @@ export function applyExtraParamsToAgent(
   const merged = Object.assign({}, extraParams, override);
 
   // Auto-generate metadata.user_id from sessionKey if not configured
-  if (sessionKey && !merged.metadata?.user_id) {
+  const existingMetadata = merged.metadata as Record<string, unknown> | undefined;
+  if (sessionKey && !existingMetadata?.user_id) {
     const autoUserId = `user_openclaw_${sessionKey.replace(/[^a-zA-Z0-9_-]/g, "_")}`;
-    merged.metadata = { ...merged.metadata, user_id: autoUserId };
+    merged.metadata = { ...existingMetadata, user_id: autoUserId };
     log.debug(`auto-generated metadata.user_id: ${autoUserId}`);
   }
   const wrappedStreamFn = createStreamFnWithExtraParams(agent.streamFn, merged, provider);
