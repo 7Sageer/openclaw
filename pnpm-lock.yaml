@@ -15,9 +15,9 @@ overrides:
   tough-cookie: 4.1.3
 
 patchedDependencies:
-  '@mariozechner/pi-ai':
-    hash: 19b9584d545f65cc2566fe6f50e226590a7419d1ad1201889527105e90519008
-    path: patches/@mariozechner__pi-ai.patch
+  '@mariozechner/pi-ai@0.52.6':
+    hash: 185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1
+    path: patches/@mariozechner__pi-ai@0.52.6.patch
 
 importers:
 
@@ -57,8 +57,8 @@ importers:
         specifier: 0.51.6
         version: 0.51.6(ws@8.19.0)(zod@4.3.6)
       '@mariozechner/pi-ai':
-        specifier: 0.51.6
-        version: 0.51.6(patch_hash=19b9584d545f65cc2566fe6f50e226590a7419d1ad1201889527105e90519008)(ws@8.19.0)(zod@4.3.6)
+        specifier: 0.52.6
+        version: 0.52.6(patch_hash=185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1)(ws@8.19.0)(zod@4.3.6)
       '@mariozechner/pi-coding-agent':
         specifier: 0.51.6
         version: 0.51.6(ws@8.19.0)(zod@4.3.6)
@@ -607,6 +607,15 @@ packages:
       zod:
         optional: true
 
+  '@anthropic-ai/sdk@0.73.0':
+    resolution: {integrity: sha512-URURVzhxXGJDGUGFunIOtBlSl7KWvZiAAKY/ttTkZAkXT9bTPqdk2eK0b8qqSxXpikh3QKPnPYpiyX98zf5ebw==}
+    hasBin: true
+    peerDependencies:
+      zod: ^3.25.0 || ^4.0.0
+    peerDependenciesMeta:
+      zod:
+        optional: true
+
   '@aws-crypto/crc32@5.2.0':
     resolution: {integrity: sha512-nLbCWqQNgUiwwtFsen1AdzAtvuLRsQS8rYgMuxCrdKf9kOssamGLuPwyTY9wyYblNr9+1XM8v6zoDTPPSIeANg==}
     engines: {node: '>=16.0.0'}
@@ -1065,6 +1074,15 @@ packages:
       '@modelcontextprotocol/sdk':
         optional: true
 
+  '@google/genai@1.40.0':
+    resolution: {integrity: sha512-fhIww8smT0QYRX78qWOiz/nIQhHMF5wXOrlXvj33HBrz3vKDBb+wibLcEmTA+L9dmPD4KmfNr7UF3LDQVTXNjA==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      '@modelcontextprotocol/sdk': ^1.25.2
+    peerDependenciesMeta:
+      '@modelcontextprotocol/sdk':
+        optional: true
+
   '@grammyjs/runner@2.0.3':
     resolution: {integrity: sha512-nckmTs1dPWfVQteK9cxqxzE+0m1VRvluLWB8UgFzsjg62w3qthPJt0TYtJBEdG7OedvfQq4vnFAyE6iaMkR42A==}
     engines: {node: '>=12.20.0 || >=14.13.1'}
@@ -1447,6 +1465,11 @@ packages:
 
   '@mariozechner/pi-ai@0.51.6':
     resolution: {integrity: sha512-vzB7M2NPpjQmAZEtSN+v5rgYVhDUBoshtmXUGuHwx4SLIaHl1Z9eSeJg+HwclQPjesNuxhdBiHAHg8CEZ+3Dfg==}
+    engines: {node: '>=20.0.0'}
+    hasBin: true
+
+  '@mariozechner/pi-ai@0.52.6':
+    resolution: {integrity: sha512-4oqhoFvYh5GQI8TzxhrXs3tXLOAw+/VvqEQRDJzo0k7Rye0ONWOLcaHAUSfBtOTn15gMUh6m+SjtWXmKVisdBg==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
@@ -5533,6 +5556,12 @@ snapshots:
     optionalDependencies:
       zod: 4.3.6
 
+  '@anthropic-ai/sdk@0.73.0(zod@4.3.6)':
+    dependencies:
+      json-schema-to-ts: 3.1.1
+    optionalDependencies:
+      zod: 4.3.6
+
   '@aws-crypto/crc32@5.2.0':
     dependencies:
       '@aws-crypto/util': 5.2.0
@@ -6347,6 +6376,16 @@ snapshots:
       - supports-color
       - utf-8-validate
 
+  '@google/genai@1.40.0':
+    dependencies:
+      google-auth-library: 10.5.0
+      protobufjs: 7.5.4
+      ws: 8.19.0
+    transitivePeerDependencies:
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+
   '@grammyjs/runner@2.0.3(grammy@1.39.3)':
     dependencies:
       abort-controller: 3.0.0
@@ -6660,7 +6699,7 @@ snapshots:
 
   '@mariozechner/pi-agent-core@0.51.6(ws@8.19.0)(zod@4.3.6)':
     dependencies:
-      '@mariozechner/pi-ai': 0.51.6(patch_hash=19b9584d545f65cc2566fe6f50e226590a7419d1ad1201889527105e90519008)(ws@8.19.0)(zod@4.3.6)
+      '@mariozechner/pi-ai': 0.51.6(ws@8.19.0)(zod@4.3.6)
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
       - aws-crt
@@ -6670,7 +6709,7 @@ snapshots:
       - ws
       - zod
 
-  '@mariozechner/pi-ai@0.51.6(patch_hash=19b9584d545f65cc2566fe6f50e226590a7419d1ad1201889527105e90519008)(ws@8.19.0)(zod@4.3.6)':
+  '@mariozechner/pi-ai@0.51.6(ws@8.19.0)(zod@4.3.6)':
     dependencies:
       '@anthropic-ai/sdk': 0.71.2(zod@4.3.6)
       '@aws-sdk/client-bedrock-runtime': 3.983.0
@@ -6694,11 +6733,35 @@ snapshots:
       - ws
       - zod
 
+  '@mariozechner/pi-ai@0.52.6(patch_hash=185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1)(ws@8.19.0)(zod@4.3.6)':
+    dependencies:
+      '@anthropic-ai/sdk': 0.73.0(zod@4.3.6)
+      '@aws-sdk/client-bedrock-runtime': 3.983.0
+      '@google/genai': 1.40.0
+      '@mistralai/mistralai': 1.10.0
+      '@sinclair/typebox': 0.34.47
+      ajv: 8.17.1
+      ajv-formats: 3.0.1(ajv@8.17.1)
+      chalk: 5.6.2
+      openai: 6.10.0(ws@8.19.0)(zod@4.3.6)
+      partial-json: 0.1.7
+      proxy-agent: 6.5.0
+      undici: 7.20.0
+      zod-to-json-schema: 3.25.1(zod@4.3.6)
+    transitivePeerDependencies:
+      - '@modelcontextprotocol/sdk'
+      - aws-crt
+      - bufferutil
+      - supports-color
+      - utf-8-validate
+      - ws
+      - zod
+
   '@mariozechner/pi-coding-agent@0.51.6(ws@8.19.0)(zod@4.3.6)':
     dependencies:
       '@mariozechner/jiti': 2.6.5
       '@mariozechner/pi-agent-core': 0.51.6(ws@8.19.0)(zod@4.3.6)
-      '@mariozechner/pi-ai': 0.51.6(patch_hash=19b9584d545f65cc2566fe6f50e226590a7419d1ad1201889527105e90519008)(ws@8.19.0)(zod@4.3.6)
+      '@mariozechner/pi-ai': 0.51.6(ws@8.19.0)(zod@4.3.6)
       '@mariozechner/pi-tui': 0.51.6
       '@silvia-odwyer/photon-node': 0.3.4
       chalk: 5.6.2

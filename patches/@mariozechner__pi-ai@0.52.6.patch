@@ -1,8 +1,8 @@
 diff --git a/dist/providers/anthropic.js b/dist/providers/anthropic.js
-index e94eff863c3227604cdefcd9ff2087bda03be979..12e60e26e15e96ebc43fbece02394bb1be051d0c 100644
+index 1954cc92887793559c3b73c15bb84db4b5af0d93..8e4a64586cab1ba0fcb457284c4801d18311a208 100644
 --- a/dist/providers/anthropic.js
 +++ b/dist/providers/anthropic.js
-@@ -426,6 +426,9 @@ function buildParams(model, context, isOAuthToken, options) {
+@@ -473,6 +473,9 @@ function buildParams(model, context, isOAuthToken, options) {
              params.tool_choice = options.toolChoice;
          }
      }
