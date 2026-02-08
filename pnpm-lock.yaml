@@ -15,9 +15,9 @@ overrides:
   tough-cookie: 4.1.3
 
 patchedDependencies:
-  '@mariozechner/pi-ai@0.52.7':
+  '@mariozechner/pi-ai@0.52.8':
     hash: 185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1
-    path: patches/@mariozechner__pi-ai@0.52.7.patch
+    path: patches/@mariozechner__pi-ai@0.52.8.patch
 
 importers:
 
@@ -54,17 +54,17 @@ importers:
         specifier: 1.2.0-beta.3
         version: 1.2.0-beta.3
       '@mariozechner/pi-agent-core':
-        specifier: 0.52.7
-        version: 0.52.7(ws@8.19.0)(zod@4.3.6)
+        specifier: 0.52.8
+        version: 0.52.8(ws@8.19.0)(zod@4.3.6)
       '@mariozechner/pi-ai':
-        specifier: 0.52.7
-        version: 0.52.7(patch_hash=185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1)(ws@8.19.0)(zod@4.3.6)
+        specifier: 0.52.8
+        version: 0.52.8(patch_hash=185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1)(ws@8.19.0)(zod@4.3.6)
       '@mariozechner/pi-coding-agent':
-        specifier: 0.52.7
-        version: 0.52.7(ws@8.19.0)(zod@4.3.6)
+        specifier: 0.52.8
+        version: 0.52.8(ws@8.19.0)(zod@4.3.6)
       '@mariozechner/pi-tui':
-        specifier: 0.52.7
-        version: 0.52.7
+        specifier: 0.52.8
+        version: 0.52.8
       '@mozilla/readability':
         specifier: ^0.6.0
         version: 0.6.0
@@ -440,12 +440,13 @@ importers:
       express:
         specifier: ^5.2.1
         version: 5.2.1
-      openclaw:
-        specifier: workspace:*
-        version: link:../..
       proper-lockfile:
         specifier: ^4.1.2
         version: 4.1.2
+    devDependencies:
+      openclaw:
+        specifier: workspace:*
+        version: link:../..
 
   extensions/nextcloud-talk:
     devDependencies:
@@ -458,12 +459,13 @@ importers:
       nostr-tools:
         specifier: ^2.23.0
         version: 2.23.0(typescript@5.9.3)
-      openclaw:
-        specifier: workspace:*
-        version: link:../..
       zod:
         specifier: ^4.3.6
         version: 4.3.6
+    devDependencies:
+      openclaw:
+        specifier: workspace:*
+        version: link:../..
 
   extensions/open-prose:
     devDependencies:
@@ -545,18 +547,20 @@ importers:
 
   extensions/zalo:
     dependencies:
-      openclaw:
-        specifier: workspace:*
-        version: link:../..
       undici:
         specifier: 7.21.0
         version: 7.21.0
+    devDependencies:
+      openclaw:
+        specifier: workspace:*
+        version: link:../..
 
   extensions/zalouser:
     dependencies:
       '@sinclair/typebox':
         specifier: 0.34.48
         version: 0.34.48
+    devDependencies:
       openclaw:
         specifier: workspace:*
         version: link:../..
@@ -1439,22 +1443,22 @@ packages:
     resolution: {integrity: sha512-faGUlTcXka5l7rv0lP3K3vGW/ejRuOS24RR2aSFWREUQqzjgdsuWNo/IiPqL3kWRGt6Ahl2+qcDAwtdeWeuGUw==}
     hasBin: true
 
-  '@mariozechner/pi-agent-core@0.52.7':
-    resolution: {integrity: sha512-zthFSKW7aha7R9jKktDWt+pD5qeK0cT1TI6Ge/lqUDsPbjXj/vkyh1/BLJa8KtfKQzJaC0IXtWhUO2LQzyKwsw==}
+  '@mariozechner/pi-agent-core@0.52.8':
+    resolution: {integrity: sha512-oI563VL+JInc3L9n3PyA5wouUWrhNjXjB28o2FXnfyL7OngGgMIf4+bbvMjX7AdF8dZhUeskCftozZQZS5T0xQ==}
     engines: {node: '>=20.0.0'}
 
-  '@mariozechner/pi-ai@0.52.7':
-    resolution: {integrity: sha512-kr3isYX1wVxHaKok1Sa6Jbx9TgVp+Vp24LrVxUtQRXGMq6IjB5/RLLF61XT8pgGLBPhs/8esQbO/Av3l2MJibA==}
-    engines: {node: '>=20.0.0'}
-    hasBin: true
-
-  '@mariozechner/pi-coding-agent@0.52.7':
-    resolution: {integrity: sha512-C2O7zzpkC0SMAFlB/n92lT8N2gM7VAy/vlMZYXrreqZGrgeV6DjOuvYn9364K7+xREo/N7bJsjqMohrvxoKBcw==}
+  '@mariozechner/pi-ai@0.52.8':
+    resolution: {integrity: sha512-+aFCUbKJcskDJhr9wPcMBTy0x/xWio5v1dkxRYXUBPWp+Zt9DSdT5Kmd/IIQ+a0TOZDF4ajt4GY/oAw37X7XTw==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
-  '@mariozechner/pi-tui@0.52.7':
-    resolution: {integrity: sha512-wS9zw4lvUaVU8jAGdk4C2KN/AwEsESrguUGNpZs7g9PD8iDBE9gnXtMvtny4PDbjOk0mZ5D0CEUgMzl/ZhqH8w==}
+  '@mariozechner/pi-coding-agent@0.52.8':
+    resolution: {integrity: sha512-a1bjKKyH9YU4/gRG+E57QirDLn/4U+vJksQQSo7ZF2IvhmQh1ro5DH7gIejC8FFXQZRbEQo9lpfFhJl3pk5b7A==}
+    engines: {node: '>=20.0.0'}
+    hasBin: true
+
+  '@mariozechner/pi-tui@0.52.8':
+    resolution: {integrity: sha512-QCrzHlZhOPoFY5UMc2hhBj5tXSO81hWBXlC6jBrq+o0JA47pTGvbDtFtwsjbsVAxoQiEdFWqreqwnX3tCBKimQ==}
     engines: {node: '>=20.0.0'}
 
   '@matrix-org/matrix-sdk-crypto-nodejs@0.4.0':
@@ -2663,12 +2667,12 @@ packages:
   '@swc/helpers@0.5.18':
     resolution: {integrity: sha512-TXTnIcNJQEKwThMMqBXsZ4VGAza6bvN4pa41Rkqoio6QBKMvo+5lexeTMScGCIxtzgQJzElcvIltani+adC5PQ==}
 
-  '@thi.ng/bitstream@2.4.39':
-    resolution: {integrity: sha512-VhdYiBqoSpCXil4BGMgHr6fS0i1uGWTqE2oszd453bDmAdthc24VUvzZoKu7GorLopOJwrnkhpcAl5004hpYaw==}
+  '@thi.ng/bitstream@2.4.40':
+    resolution: {integrity: sha512-zMQ3xbfxlMwfUjEjnTtXE3ism/CVrfKug/Yn8EeljEWqR/s69QY7Avr60limwA25808kBR/P7BW4tNIx6RKI6w==}
     engines: {node: '>=18'}
 
-  '@thi.ng/errors@2.6.2':
-    resolution: {integrity: sha512-YN89WmgOhAnK5/2gI9LckplmQCYld6adPUgjTo8DozgutAqF7zzYfuzFrCGztbT6zBwaCWUpPyQboiu+OtZIvA==}
+  '@thi.ng/errors@2.6.3':
+    resolution: {integrity: sha512-owkOOKHf7MrAPN2jNpKWDdY/vjtPFiJf6oxZ3jkkhV6ICTu2iY1fXIR2wQ7kVEeybdtb0w24k2PtrU43OYCWdg==}
     engines: {node: '>=18'}
 
   '@tinyhttp/content-disposition@2.2.3':
@@ -6680,9 +6684,9 @@ snapshots:
       std-env: 3.10.0
       yoctocolors: 2.1.2
 
-  '@mariozechner/pi-agent-core@0.52.7(ws@8.19.0)(zod@4.3.6)':
+  '@mariozechner/pi-agent-core@0.52.8(ws@8.19.0)(zod@4.3.6)':
     dependencies:
-      '@mariozechner/pi-ai': 0.52.7(patch_hash=185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1)(ws@8.19.0)(zod@4.3.6)
+      '@mariozechner/pi-ai': 0.52.8(patch_hash=185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1)(ws@8.19.0)(zod@4.3.6)
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
       - aws-crt
@@ -6692,7 +6696,7 @@ snapshots:
       - ws
       - zod
 
-  '@mariozechner/pi-ai@0.52.7(patch_hash=185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1)(ws@8.19.0)(zod@4.3.6)':
+  '@mariozechner/pi-ai@0.52.8(patch_hash=185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1)(ws@8.19.0)(zod@4.3.6)':
     dependencies:
       '@anthropic-ai/sdk': 0.73.0(zod@4.3.6)
       '@aws-sdk/client-bedrock-runtime': 3.985.0
@@ -6716,12 +6720,12 @@ snapshots:
       - ws
       - zod
 
-  '@mariozechner/pi-coding-agent@0.52.7(ws@8.19.0)(zod@4.3.6)':
+  '@mariozechner/pi-coding-agent@0.52.8(ws@8.19.0)(zod@4.3.6)':
     dependencies:
       '@mariozechner/jiti': 2.6.5
-      '@mariozechner/pi-agent-core': 0.52.7(ws@8.19.0)(zod@4.3.6)
-      '@mariozechner/pi-ai': 0.52.7(patch_hash=185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1)(ws@8.19.0)(zod@4.3.6)
-      '@mariozechner/pi-tui': 0.52.7
+      '@mariozechner/pi-agent-core': 0.52.8(ws@8.19.0)(zod@4.3.6)
+      '@mariozechner/pi-ai': 0.52.8(patch_hash=185024519a67abbf88c005927506a9cce7d15dccb0d8ff2fb7ba15520b9992a1)(ws@8.19.0)(zod@4.3.6)
+      '@mariozechner/pi-tui': 0.52.8
       '@silvia-odwyer/photon-node': 0.3.4
       chalk: 5.6.2
       cli-highlight: 2.1.11
@@ -6745,7 +6749,7 @@ snapshots:
       - ws
       - zod
 
-  '@mariozechner/pi-tui@0.52.7':
+  '@mariozechner/pi-tui@0.52.8':
     dependencies:
       '@types/mime-types': 2.1.4
       chalk: 5.6.2
@@ -7975,12 +7979,12 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@thi.ng/bitstream@2.4.39':
+  '@thi.ng/bitstream@2.4.40':
     dependencies:
-      '@thi.ng/errors': 2.6.2
+      '@thi.ng/errors': 2.6.3
     optional: true
 
-  '@thi.ng/errors@2.6.2':
+  '@thi.ng/errors@2.6.3':
     optional: true
 
   '@tinyhttp/content-disposition@2.2.3': {}
@@ -10357,7 +10361,7 @@ snapshots:
 
   qoa-format@1.0.1:
     dependencies:
-      '@thi.ng/bitstream': 2.4.39
+      '@thi.ng/bitstream': 2.4.40
     optional: true
 
   qrcode-terminal@0.12.0: {}
