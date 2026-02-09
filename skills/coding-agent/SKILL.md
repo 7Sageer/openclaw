@@ -165,6 +165,59 @@ bash pty:true workdir:~/project command:"claude 'Your task'"
 bash pty:true workdir:~/project background:true command:"claude 'Your task'"
 ```
 
+### Agent Teams (Swarm Mode)
+
+Claude Code supports **multi-agent orchestration** via Agent Teams (experimental, shipped Feb 2026 with Opus 4.6). A lead agent plans and delegates to multiple specialist agents that work **in parallel** with independent context windows and git worktrees.
+
+**Enable:**
+
+```bash
+# Environment variable
+export CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1
+
+# Or in Claude Code settings
+# Settings → Experimental → Agent Teams → Enable
+```
+
+**Usage:**
+
+```bash
+# One-shot with agent teams enabled
+bash pty:true workdir:~/project command:"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude 'Build auth system with OAuth, tests, and docs'"
+
+# Background (recommended for complex tasks)
+bash pty:true workdir:~/project background:true command:"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 claude 'Refactor the entire API layer: split routes, add validation, write tests, update docs'"
+```
+
+**How it works internally:**
+
+1. Lead agent receives your task, creates a plan
+2. On approval, lead spawns specialist agents (frontend, backend, testing, docs, etc.)
+3. Each agent gets its own context window + **separate git worktree** (no file conflicts)
+4. Agents coordinate via shared task board (`~/.claude/tasks/{team-name}/`) and @mention messaging
+5. Workers complete tasks, lead synthesizes results and merges
+
+**When to use Agent Teams:**
+
+- Large refactors spanning many files/modules
+- Tasks with naturally parallel subtasks (implement + test + document)
+- When single-agent context window isn't enough for the codebase
+- Complex feature builds with multiple concerns
+
+**When NOT to use:**
+
+- Simple one-file changes (overkill)
+- Quick fixes or small PRs
+
+**Known limitations:**
+
+- **Requires git repo** — worktree isolation needs git
+- **No session resumption** — if the lead dies, the whole team dies
+- **No nested teams** — a worker can't spawn its own sub-team
+- **Monitoring** — `process:log` shows the lead's terminal; worker details may be less visible
+
+**Docs:** https://code.claude.com/docs/en/agent-teams
+
 ---
 
 ## OpenCode
