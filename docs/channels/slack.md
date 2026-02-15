@@ -137,17 +137,18 @@ For actions/directory reads, user token can be preferred when configured. For wr
 
 <Tabs>
   <Tab title="DM policy">
-    `channels.slack.dm.policy` controls DM access:
+    `channels.slack.dmPolicy` controls DM access (legacy: `channels.slack.dm.policy`):
 
     - `pairing` (default)
     - `allowlist`
-    - `open` (requires `dm.allowFrom` to include `"*"`)
+    - `open` (requires `channels.slack.allowFrom` to include `"*"`; legacy: `channels.slack.dm.allowFrom`)
     - `disabled`
 
     DM flags:
 
     - `dm.enabled` (default true)
-    - `dm.allowFrom`
+    - `channels.slack.allowFrom` (preferred)
+    - `dm.allowFrom` (legacy)
     - `dm.groupEnabled` (group DMs default false)
     - `dm.groupChannels` (optional MPIM allowlist)
 
@@ -286,6 +287,22 @@ Available action groups in current Slack tooling:
 - `channel_id_changed` can migrate channel config keys when `configWrites` is enabled.
 - Channel topic/purpose metadata is treated as untrusted context and can be injected into routing context.
 
+## Ack reactions
+
+`ackReaction` sends an acknowledgement emoji while OpenClaw is processing an inbound message.
+
+Resolution order:
+
+- `channels.slack.accounts.<accountId>.ackReaction`
+- `channels.slack.ackReaction`
+- `messages.ackReaction`
+- agent identity emoji fallback (`agents.list[].identity.emoji`, else "👀")
+
+Notes:
+
+- Slack expects shortcodes (for example `"eyes"`).
+- Use `""` to disable the reaction for a channel or account.
+
 ## Manifest and scope checklist
 
 <AccordionGroup>
@@ -399,7 +416,7 @@ openclaw doctor
     Check:
 
     - `channels.slack.dm.enabled`
-    - `channels.slack.dm.policy`
+    - `channels.slack.dmPolicy` (or legacy `channels.slack.dm.policy`)
     - pairing approvals / allowlist entries
 
 ```bash
@@ -439,14 +456,13 @@ Primary reference:
 
 - [Configuration reference - Slack](/gateway/configuration-reference#slack)
 
-High-signal Slack fields:
-
-- mode/auth: `mode`, `botToken`, `appToken`, `signingSecret`, `webhookPath`, `accounts.*`
-- DM access: `dm.enabled`, `dm.policy`, `dm.allowFrom`, `dm.groupEnabled`, `dm.groupChannels`
-- channel access: `groupPolicy`, `channels.*`, `channels.*.users`, `channels.*.requireMention`
-- threading/history: `replyToMode`, `replyToModeByChatType`, `thread.*`, `historyLimit`, `dmHistoryLimit`, `dms.*.historyLimit`
-- delivery: `textChunkLimit`, `chunkMode`, `mediaMaxMb`
-- ops/features: `configWrites`, `commands.native`, `slashCommand.*`, `actions.*`, `userToken`, `userTokenReadOnly`
+  High-signal Slack fields:
+  - mode/auth: `mode`, `botToken`, `appToken`, `signingSecret`, `webhookPath`, `accounts.*`
+  - DM access: `dm.enabled`, `dmPolicy`, `allowFrom` (legacy: `dm.policy`, `dm.allowFrom`), `dm.groupEnabled`, `dm.groupChannels`
+  - channel access: `groupPolicy`, `channels.*`, `channels.*.users`, `channels.*.requireMention`
+  - threading/history: `replyToMode`, `replyToModeByChatType`, `thread.*`, `historyLimit`, `dmHistoryLimit`, `dms.*.historyLimit`
+  - delivery: `textChunkLimit`, `chunkMode`, `mediaMaxMb`
+  - ops/features: `configWrites`, `commands.native`, `slashCommand.*`, `actions.*`, `userToken`, `userTokenReadOnly`
 
 ## Related
 

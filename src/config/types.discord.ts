@@ -113,6 +113,15 @@ export type DiscordAgentComponentsConfig = {
   enabled?: boolean;
 };
 
+export type DiscordUiComponentsConfig = {
+  /** Accent color used by Discord component containers (hex). */
+  accentColor?: string;
+};
+
+export type DiscordUiConfig = {
+  components?: DiscordUiComponentsConfig;
+};
+
 export type DiscordAccountConfig = {
   /** Optional display name for this account (used in CLI/UI lists). */
   name?: string;
@@ -164,6 +173,16 @@ export type DiscordAccountConfig = {
   actions?: DiscordActionConfig;
   /** Control reply threading when reply tags are present (off|first|all). */
   replyToMode?: ReplyToMode;
+  /**
+   * Alias for dm.policy (prefer this so it inherits cleanly via base->account shallow merge).
+   * Legacy key: channels.discord.dm.policy.
+   */
+  dmPolicy?: DmPolicy;
+  /**
+   * Alias for dm.allowFrom (prefer this so it inherits cleanly via base->account shallow merge).
+   * Legacy key: channels.discord.dm.allowFrom.
+   */
+  allowFrom?: Array<string | number>;
   dm?: DiscordDmConfig;
   /** New per-guild config keyed by guild id or slug. */
   guilds?: Record<string, DiscordGuildEntry>;
@@ -173,12 +192,19 @@ export type DiscordAccountConfig = {
   execApprovals?: DiscordExecApprovalConfig;
   /** Agent-controlled interactive components (buttons, select menus). */
   agentComponents?: DiscordAgentComponentsConfig;
+  /** Discord UI customization (components, modals, etc.). */
+  ui?: DiscordUiConfig;
   /** Privileged Gateway Intents (must also be enabled in Discord Developer Portal). */
   intents?: DiscordIntentsConfig;
   /** PluralKit identity resolution for proxied messages. */
   pluralkit?: DiscordPluralKitConfig;
   /** Outbound response prefix override for this channel/account. */
   responsePrefix?: string;
+  /**
+   * Per-channel ack reaction override.
+   * Discord supports both unicode emoji and custom emoji names.
+   */
+  ackReaction?: string;
   /** Bot activity status text (e.g. "Watching X"). */
   activity?: string;
   /** Bot status (online|dnd|idle|invisible). Defaults to online when presence is configured. */

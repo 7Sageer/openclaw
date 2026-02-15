@@ -118,7 +118,7 @@ export async function preflightDiscordMessage(
     return null;
   }
 
-  const dmPolicy = params.discordConfig?.dm?.policy ?? "pairing";
+  const dmPolicy = params.discordConfig?.dmPolicy ?? params.discordConfig?.dm?.policy ?? "pairing";
   let commandAuthorized = true;
   if (isDirectMessage) {
     if (dmPolicy === "disabled") {
@@ -224,8 +224,8 @@ export async function preflightDiscordMessage(
   }
 
   // Fresh config for bindings lookup; other routing inputs are payload-derived.
-  const memberRoleIds = Array.isArray(params.data.member?.roles)
-    ? params.data.member.roles.map((roleId: string) => String(roleId))
+  const memberRoleIds = Array.isArray(params.data.rawMember?.roles)
+    ? params.data.rawMember.roles.map((roleId: string) => String(roleId))
     : [];
   const route = resolveAgentRoute({
     cfg: loadConfig(),
