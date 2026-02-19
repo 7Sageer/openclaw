@@ -645,7 +645,6 @@ export async function runEmbeddedAttempt(
         params.provider,
         params.modelId,
         params.streamParams,
-        params.sessionKey,
       );
 
       if (cacheTrace) {
