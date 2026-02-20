@@ -66,6 +66,7 @@ export const ModelProviderSchema = z
     headers: z.record(z.string(), z.string()).optional(),
     authHeader: z.boolean().optional(),
     models: z.array(ModelDefinitionSchema),
+    metadata: z.record(z.string(), z.unknown()).optional(),
   })
   .strict();
 
