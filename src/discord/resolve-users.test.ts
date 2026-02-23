@@ -1,17 +1,33 @@
 import { describe, expect, it } from "vitest";
 import { withFetchPreconnect } from "../test-utils/fetch-mock.js";
 import { resolveDiscordUserAllowlist } from "./resolve-users.js";
+import { jsonResponse, urlToString } from "./test-http-helpers.js";
 
-function jsonResponse(body: unknown) {
-  return new Response(JSON.stringify(body), { status: 200 });
+function createGuildListProbeFetcher() {
+  let guildsCalled = false;
+  const fetcher = withFetchPreconnect(async (input: RequestInfo | URL) => {
+    const url = urlToString(input);
+    if (url.endsWith("/users/@me/guilds")) {
+      guildsCalled = true;
+      return jsonResponse([]);
+    }
+    return new Response("not found", { status: 404 });
+  });
+  return {
+    fetcher,
+    wasGuildsCalled: () => guildsCalled,
+  };
 }
 
-const urlToString = (url: Request | URL | string): string => {
-  if (typeof url === "string") {
-    return url;
-  }
-  return "url" in url ? url.url : String(url);
-};
+function createGuildsForbiddenFetcher() {
+  return withFetchPreconnect(async (input: RequestInfo | URL) => {
+    const url = urlToString(input);
+    if (url.endsWith("/users/@me/guilds")) {
+      throw new Error("Forbidden: Missing Access");
+    }
+    return new Response("not found", { status: 404 });
+  });
+}
 
 function createGuildListProbeFetcher() {
   let guildsCalled = false;
@@ -84,13 +100,7 @@ describe("resolveDiscordUserAllowlist", () => {
   });
 
   it("resolves user ids even when listGuilds would fail", async () => {
-    const fetcher = withFetchPreconnect(async (input: RequestInfo | URL) => {
-      const url = urlToString(input);
-      if (url.endsWith("/users/@me/guilds")) {
-        throw new Error("Forbidden: Missing Access");
-      }
-      return new Response("not found", { status: 404 });
-    });
+    const fetcher = createGuildsForbiddenFetcher();
 
     // Before the fix, this would throw because listGuilds() was called eagerly
     const results = await resolveDiscordUserAllowlist({
@@ -177,13 +187,7 @@ describe("resolveDiscordUserAllowlist", () => {
   });
 
   it("handles mixed ids and usernames — ids resolve even if guilds fail", async () => {
-    const fetcher = withFetchPreconnect(async (input: RequestInfo | URL) => {
-      const url = urlToString(input);
-      if (url.endsWith("/users/@me/guilds")) {
-        throw new Error("Forbidden: Missing Access");
-      }
-      return new Response("not found", { status: 404 });
-    });
+    const fetcher = createGuildsForbiddenFetcher();
 
     // IDs should succeed, username should fail (listGuilds throws)
     await expect(

@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
-import os from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { withTempDir } from "../test-utils/temp-dir.js";
 import {
   getChannelActivity,
   recordChannelActivity,
@@ -226,6 +226,14 @@ describe("infra store", () => {
       expect(cache.check("a", 120)).toBe(false);
       expect(cache.check("c", 200)).toBe(false);
       expect(cache.size()).toBe(2);
+    });
+
+    it("supports non-mutating existence checks via peek()", () => {
+      const cache = createDedupeCache({ ttlMs: 1000, maxSize: 10 });
+      expect(cache.peek("a", 100)).toBe(false);
+      expect(cache.check("a", 100)).toBe(false);
+      expect(cache.peek("a", 200)).toBe(true);
+      expect(cache.peek("a", 1201)).toBe(false);
     });
   });
 });

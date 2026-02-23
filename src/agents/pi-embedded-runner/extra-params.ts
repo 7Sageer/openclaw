@@ -1,6 +1,7 @@
 import type { StreamFn } from "@mariozechner/pi-agent-core";
 import type { SimpleStreamOptions } from "@mariozechner/pi-ai";
 import { streamSimple } from "@mariozechner/pi-ai";
+import type { ThinkLevel } from "../../auto-reply/thinking.js";
 import type { OpenClawConfig } from "../../config/config.js";
 import { log } from "./logger.js";
 
@@ -28,17 +29,7 @@ export function resolveExtraParams(params: {
 }): Record<string, unknown> | undefined {
   const modelKey = `${params.provider}/${params.modelId}`;
   const modelConfig = params.cfg?.agents?.defaults?.models?.[modelKey];
-  const modelParams = modelConfig?.params ? { ...modelConfig.params } : {};
-
-  // Also check provider-level metadata from models.providers config
-  const providerConfig = (
-    params.cfg?.models?.providers as Record<string, { metadata?: unknown }> | undefined
-  )?.[params.provider];
-  if (providerConfig?.metadata && !modelParams.metadata) {
-    modelParams.metadata = providerConfig.metadata;
-  }
-
-  return Object.keys(modelParams).length > 0 ? modelParams : undefined;
+  return modelConfig?.params ? { ...modelConfig.params } : undefined;
 }
 
 type CacheRetention = "none" | "short" | "long";
@@ -108,18 +99,43 @@ function createStreamFnWithExtraParams(
     (streamParams as Record<string, unknown>).metadata = extraParams.metadata;
   }
 
-  if (Object.keys(streamParams).length === 0) {
+  // Extract OpenRouter provider routing preferences from extraParams.provider.
+  // Injected into model.compat.openRouterRouting so pi-ai's buildParams sets
+  // params.provider in the API request body (openai-completions.js L359-362).
+  // pi-ai's OpenRouterRouting type only declares { only?, order? }, but at
+  // runtime the full object is forwarded — enabling allow_fallbacks,
+  // data_collection, ignore, sort, quantizations, etc.
+  const providerRouting =
+    provider === "openrouter" &&
+    extraParams.provider != null &&
+    typeof extraParams.provider === "object"
+      ? (extraParams.provider as Record<string, unknown>)
+      : undefined;
+
+  if (Object.keys(streamParams).length === 0 && !providerRouting) {
     return undefined;
   }
 
   log.debug(`creating streamFn wrapper with params: ${JSON.stringify(streamParams)}`);
+  if (providerRouting) {
+    log.debug(`OpenRouter provider routing: ${JSON.stringify(providerRouting)}`);
+  }
 
   const underlying = baseStreamFn ?? streamSimple;
-  const wrappedStreamFn: StreamFn = (model, context, options) =>
-    underlying(model, context, {
+  const wrappedStreamFn: StreamFn = (model, context, options) => {
+    // When provider routing is configured, inject it into model.compat so
+    // pi-ai picks it up via model.compat.openRouterRouting.
+    const effectiveModel = providerRouting
+      ? ({
+          ...model,
+          compat: { ...model.compat, openRouterRouting: providerRouting },
+        } as unknown as typeof model)
+      : model;
+    return underlying(effectiveModel, context, {
       ...streamParams,
       ...options,
     });
+  };
 
   return wrappedStreamFn;
 }
@@ -277,20 +293,116 @@ function createAnthropicBetaHeadersWrapper(
   };
 }
 
+function isOpenRouterAnthropicModel(provider: string, modelId: string): boolean {
+  return provider.toLowerCase() === "openrouter" && modelId.toLowerCase().startsWith("anthropic/");
+}
+
+type PayloadMessage = {
+  role?: string;
+  content?: unknown;
+};
+
 /**
- * Create a streamFn wrapper that adds OpenRouter app attribution headers.
- * These headers allow OpenClaw to appear on OpenRouter's leaderboard.
+ * Inject cache_control into the system message for OpenRouter Anthropic models.
+ * OpenRouter passes through Anthropic's cache_control field — caching the system
+ * prompt avoids re-processing it on every request.
  */
-function createOpenRouterHeadersWrapper(baseStreamFn: StreamFn | undefined): StreamFn {
+function createOpenRouterSystemCacheWrapper(baseStreamFn: StreamFn | undefined): StreamFn {
   const underlying = baseStreamFn ?? streamSimple;
-  return (model, context, options) =>
-    underlying(model, context, {
+  return (model, context, options) => {
+    if (
+      typeof model.provider !== "string" ||
+      typeof model.id !== "string" ||
+      !isOpenRouterAnthropicModel(model.provider, model.id)
+    ) {
+      return underlying(model, context, options);
+    }
+
+    const originalOnPayload = options?.onPayload;
+    return underlying(model, context, {
+      ...options,
+      onPayload: (payload) => {
+        const messages = (payload as Record<string, unknown>)?.messages;
+        if (Array.isArray(messages)) {
+          for (const msg of messages as PayloadMessage[]) {
+            if (msg.role !== "system" && msg.role !== "developer") {
+              continue;
+            }
+            if (typeof msg.content === "string") {
+              msg.content = [
+                { type: "text", text: msg.content, cache_control: { type: "ephemeral" } },
+              ];
+            } else if (Array.isArray(msg.content) && msg.content.length > 0) {
+              const last = msg.content[msg.content.length - 1];
+              if (last && typeof last === "object") {
+                (last as Record<string, unknown>).cache_control = { type: "ephemeral" };
+              }
+            }
+          }
+        }
+        originalOnPayload?.(payload);
+      },
+    });
+  };
+}
+
+/**
+ * Map OpenClaw's ThinkLevel to OpenRouter's reasoning.effort values.
+ * "off" maps to "none"; all other levels pass through as-is.
+ */
+function mapThinkingLevelToOpenRouterReasoningEffort(
+  thinkingLevel: ThinkLevel,
+): "none" | "minimal" | "low" | "medium" | "high" | "xhigh" {
+  if (thinkingLevel === "off") {
+    return "none";
+  }
+  return thinkingLevel;
+}
+
+/**
+ * Create a streamFn wrapper that adds OpenRouter app attribution headers
+ * and injects reasoning.effort based on the configured thinking level.
+ */
+function createOpenRouterWrapper(
+  baseStreamFn: StreamFn | undefined,
+  thinkingLevel?: ThinkLevel,
+): StreamFn {
+  const underlying = baseStreamFn ?? streamSimple;
+  return (model, context, options) => {
+    const onPayload = options?.onPayload;
+    return underlying(model, context, {
       ...options,
       headers: {
         ...OPENROUTER_APP_HEADERS,
         ...options?.headers,
       },
+      onPayload: (payload) => {
+        if (thinkingLevel && payload && typeof payload === "object") {
+          const payloadObj = payload as Record<string, unknown>;
+          const existingReasoning = payloadObj.reasoning;
+
+          // OpenRouter treats reasoning.effort and reasoning.max_tokens as
+          // alternative controls. If max_tokens is already present, do not
+          // inject effort and do not overwrite caller-supplied reasoning.
+          if (
+            existingReasoning &&
+            typeof existingReasoning === "object" &&
+            !Array.isArray(existingReasoning)
+          ) {
+            const reasoningObj = existingReasoning as Record<string, unknown>;
+            if (!("max_tokens" in reasoningObj) && !("effort" in reasoningObj)) {
+              reasoningObj.effort = mapThinkingLevelToOpenRouterReasoningEffort(thinkingLevel);
+            }
+          } else if (!existingReasoning) {
+            payloadObj.reasoning = {
+              effort: mapThinkingLevelToOpenRouterReasoningEffort(thinkingLevel),
+            };
+          }
+        }
+        onPayload?.(payload);
+      },
     });
+  };
 }
 
 /**
@@ -338,6 +450,8 @@ export function applyExtraParamsToAgent(
   provider: string,
   modelId: string,
   extraParamsOverride?: Record<string, unknown>,
+  thinkingLevel?: ThinkLevel,
+  sessionId?: string,
 ): void {
   const extraParams = resolveExtraParams({
     cfg,
@@ -351,6 +465,12 @@ export function applyExtraParamsToAgent(
         )
       : undefined;
   const merged = Object.assign({}, extraParams, override);
+
+  // Inject sessionId as metadata.user_id for providers that support prompt caching
+  // keyed by user (e.g. foxapi). This replaces the old provider-config metadata approach.
+  if (sessionId && !merged.metadata) {
+    merged.metadata = { user_id: sessionId };
+  }
   const wrappedStreamFn = createStreamFnWithExtraParams(agent.streamFn, merged, provider);
 
   if (wrappedStreamFn) {
@@ -368,7 +488,8 @@ export function applyExtraParamsToAgent(
 
   if (provider === "openrouter") {
     log.debug(`applying OpenRouter app attribution headers for ${provider}/${modelId}`);
-    agent.streamFn = createOpenRouterHeadersWrapper(agent.streamFn);
+    agent.streamFn = createOpenRouterWrapper(agent.streamFn, thinkingLevel);
+    agent.streamFn = createOpenRouterSystemCacheWrapper(agent.streamFn);
   }
 
   // Enable Z.AI tool_stream for real-time tool call streaming.
