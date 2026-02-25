@@ -4,7 +4,7 @@
 import os, sys, json, argparse, httpx
 
 PROXY = os.environ.get("POLY_PROXY", "http://localhost:10808")
-BRAVE_KEY = os.environ.get("BRAVE_API_KEY", "BSAn58hOyoAO8wci5pmYmc6Z_d6Vc6j")
+BRAVE_KEY = os.environ.get("BRAVE_API_KEY", "")
 
 def _client():
     return httpx.Client(proxy=PROXY, timeout=15)
