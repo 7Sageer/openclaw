@@ -35,6 +35,20 @@ import { assertWebChannel, normalizeE164, toWhatsappJid } from "./utils.js";
 
 loadDotEnv({ quiet: true });
 normalizeEnv();
+
+// Apply global fetch proxy from models.proxy config (must run before any fetch calls)
+import { ProxyAgent, setGlobalDispatcher } from "undici";
+try {
+  const _proxyCfg = loadConfig();
+  const _proxyUrl = _proxyCfg?.models?.proxy;
+  if (_proxyUrl) {
+    setGlobalDispatcher(new ProxyAgent(_proxyUrl));
+    console.log(`[proxy] global fetch proxy set to ${_proxyUrl}`);
+  }
+} catch {
+  // ignore — config may not exist yet
+}
+
 ensureOpenClawCliOnPath();
 
 // Capture all console output into structured logs while keeping stdout/stderr behavior.
