@@ -83,6 +83,7 @@ function makeResolvedDelivery(): Extract<DeliveryTargetResolution, { ok: true }>
     to: "123456",
     accountId: undefined,
     threadId: undefined,
+    mode: "explicit",
   };
 }
 
@@ -205,6 +206,29 @@ describe("dispatchCronDelivery — double-announce guard", () => {
 
     // No announce or direct delivery should have been sent (stale interim suppressed)
     expect(runSubagentAnnounceFlow).not.toHaveBeenCalled();
+  });
+
+  it("consolidates descendant output into the cron announce path", async () => {
+    vi.mocked(countActiveDescendantRuns).mockReturnValue(0);
+    vi.mocked(isLikelyInterimCronMessage).mockReturnValue(true);
+    vi.mocked(readDescendantSubagentFallbackReply).mockResolvedValue(
+      "Detailed child result, everything finished successfully.",
+    );
+    vi.mocked(runSubagentAnnounceFlow).mockResolvedValue(true);
+
+    const params = makeBaseParams({ synthesizedText: "on it" });
+    const state = await dispatchCronDelivery(params);
+
+    expect(state.deliveryAttempted).toBe(true);
+    expect(state.delivered).toBe(true);
+    expect(runSubagentAnnounceFlow).toHaveBeenCalledTimes(1);
+    expect(runSubagentAnnounceFlow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        roundOneReply: "Detailed child result, everything finished successfully.",
+        expectsCompletionMessage: true,
+        announceType: "cron job",
+      }),
+    );
   });
 
   it("normal announce success delivers exactly once and sets deliveryAttempted=true", async () => {
